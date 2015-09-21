@@ -10,17 +10,11 @@ bool Context::addPrefixAndSuffix(const std::string& prefix, const std::string& s
 
 bool Context::addSuffix(const std::string& prefix, const std::string& suffix)
 {
-  //std::cerr << "size of map before add suffix" << map.size() << std::endl;
   std::vector<tuple> t = map[prefix];
   t.push_back(std::make_pair(suffix, 1));
   std::unordered_map<std::string, std::vector<tuple> >::const_iterator it = map.find(prefix);
   map.erase(it);
   map.emplace(prefix, t);
-  //std::cerr << "size of map after add suffix" << map.size() << std::endl;
-  //std::cerr << "suffix = " << suffix << std::endl;
-  //std::cerr << std::endl;
-  //printVector(prefix);
-  //std::cerr << std::endl;
   return true;
 }
 
@@ -32,11 +26,6 @@ bool Context::findSuffix(const std::string& prefix, const std::string& suffix)
     for(std::vector<tuple>::iterator it = t.begin();
         it != t.end(); ++it)
     {
-      if (suffix == "i") {
-        std::cerr << "size of map = " << map.size() << std::endl;
-        std::cerr << "in findSuffix: " << std::get<0>(*it) << std::endl;
-        std::cerr << "suffix = " << suffix << std::endl;
-      }
       if (std::get<0>(*it) == suffix)
         return true;
     }
@@ -91,24 +80,28 @@ double Context::getSuffixProbability( const std::string& prefix,
       char_count += std::get<1>(*it);
   }
   
-  if (suffix == "i")
-    std::cerr << "num_chars = " << num_chars << ", num_escapes = " << num_escapes << std::endl;
   double probability = char_count/(num_chars+num_escapes);
   return probability;
 }
 
 double Context::getEscapeProbability( const std::string& prefix, 
-                                      const std::string& suffix)
+                                      const std::string& suffix,
+                                      std::vector<std::string>& exceptions)
 {
   std::vector<tuple> t = map[prefix];
   double num_escapes = 0;
   double num_chars = 0;
   for (std::vector<tuple>::iterator it = t.begin(); it != t.end(); ++it)
   {
-    num_escapes++;
-    num_chars += std::get<1>(*it);
+    std::vector<std::string>::iterator its = find(exceptions.begin(), exceptions.end(), std::get<0>(*it));
+    if (its == exceptions.end())
+    {
+      num_escapes++;
+      num_chars += std::get<1>(*it);
+    }
   }
-  double probability = num_chars/(num_chars+num_escapes);
+  std::cerr << "num_escapes = " << num_escapes << ", num_chars = " << num_chars << std::endl;
+  double probability = num_escapes/(num_chars+num_escapes);
   return probability;
 }
 
@@ -175,10 +168,6 @@ void Context::printVector(std::string prefix)
 
 void Context::checkExceptions(std::string& prefix, std::string& suffix, std::vector<std::string> exceptions)
 {
-  std::cerr << "GOT HERE" << std::endl;
-  if (suffix == "i")
-    printVector(suffix);
-
   exceptions.clear();
 
   if (map.find(suffix) != map.end())

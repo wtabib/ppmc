@@ -65,7 +65,6 @@ int main()
     //iterate through each context
     for (unsigned int j = k; j > 0; --j)
     {
-      std::cerr << "CONTEXT = " << j-1 << ", prefix = " << prefix << std::endl;
 
       unsigned int idx = j-1;
 
@@ -90,16 +89,8 @@ int main()
       {
         //is the suffix there?
         bool suffix_found = cs[idx].findSuffix(prefix,suffix);
-        std::cerr << "suffix_found = " << suffix_found << " , for suffix " << suffix << std::endl;
         if (suffix_found)
         {
-          //////
-          std::cerr << "printing exceptions " << std::endl;
-          for (int i = 0; i < exceptions.size(); i++)
-          {
-            std::cerr << "exception: " << exceptions[i] << std::endl;
-          }
-          /////
           if (idx == 0) 
           {
             double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
@@ -112,6 +103,9 @@ int main()
         }
         else 
         {
+          double probability = cs[idx].getEscapeProbability(prefix, suffix, exceptions);
+          std::cerr << "<$>, " << probability << std::endl;
+
           if (idx == 0) 
           {
             double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);

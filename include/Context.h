@@ -28,7 +28,8 @@ class Context {
     bool incrementSuffixCount(const std::string& prefix, const std::string& suffix);
     bool needToPrintEscape(const std::string& prefix, const std::string& suffix, std::vector<std::string>& exceptions);
     double getEscapeProbability( const std::string& prefix, 
-                                const std::string& suffix);
+                                const std::string& suffix,
+                                std::vector<std::string>& exceptions);
 
     void printVector(std::string prefix);
 
