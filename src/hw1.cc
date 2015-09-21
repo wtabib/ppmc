@@ -8,80 +8,6 @@
 
 typedef std::tuple<std::string, unsigned int> tuple;
 
-/*
-void getEscapeCounts(unsigned int& escape, 
-    unsigned int& total_count, 
-    const std::vector<tuple>& t, 
-    const std::vector<std::string>& exceptions)
-{
-  escape = 0;
-  total_count = 0;
-
-  for (std::vector<tuple>::iterator it = t.begin(); it != t.end(); ++it)
-  {
-
-    //check to see if the string is in the exception list
-    std::string curr_str = std::get<0>(*it);
-    unsigned int curr_count = std::get<1>(*it);
-
-    if (std::find(exceptions.begin(), exceptions.end(), curr_str) 
-        != exceptions.end())
-    {
-      //we found an exception, which means we need to remove it from
-      //consideration
-      //we can do this by ignoring it
-    }
-    else
-    {
-      //tally up the escapes and the counts
-      escape++;
-      total_count += curr_count;
-    }
-  }
-}
-
-
-
-void printCharacterProbability( Context& c, 
-    std::vector<std::string>& char_vec, 
-    const std::vector<std::string>& exceptions, 
-    std::string character) 
-{
-
-  //2 cases
-  // Case 1) this is the first time we've ever seen the character.
-  //        we need to use a special null probability
-
-  //find the character in the list of all characters by ascii value
-  char ascii;
-  int numeric;
-
-  ascii = character;
-  numeric = ascii;
-
-  //check to see if the character is in our vector
-  std::vector<int>::iterator it = find(char_vec.begin(), char_vec.end(), numeric);
-  if (it != char_vec.end()) 
-  {
-    char_vec.erase(it);
-
-    //emit the probability
-    total_count = 0;
-    escape = 0;
-    for (std::vector<string>::iterator its = exceptions.begin(); its != exceptions.end(); ++its)
-    {
-
-    }
-  }
-  else 
-  {
-
-    // Case 2) this is not the first time we've seen the character,
-    //        but we still need to handle exceptions
-  }
-}*/
-
-
 int main()
 {
 
@@ -157,6 +83,7 @@ int main()
           double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
           std::cerr << suffix << ", " << suffix_probability << std::endl;
         }
+        cs[idx].checkExceptions(prefix, suffix, exceptions);
         cs[idx].addPrefixAndSuffix(prefix,suffix);
       }
       else 
@@ -179,10 +106,22 @@ int main()
             std::cerr << suffix << ", " << suffix_probability << std::endl;
           }
 
+          cs[idx].checkExceptions(prefix, suffix, exceptions);
           bool increment_success = cs[idx].incrementSuffixCount(prefix, suffix);
           assert(increment_success);
         }
         else 
+        {
+          if (idx == 0) 
+          {
+            double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
+            std::cerr << suffix << ", " << suffix_probability << std::endl;
+          }
+
+          cs[idx].checkExceptions(prefix, suffix, exceptions);
+          cs[idx].addSuffix(prefix, suffix);
+        }
+        /*else 
         {
           //now we have to deal with escape bullshit
           bool do_we_escape = cs[idx].needToPrintEscape(prefix, suffix, exceptions);
@@ -200,8 +139,9 @@ int main()
             std::cerr << suffix << ", " << suffix_probability << std::endl;
           }
           cs[idx].addSuffix(prefix, suffix);
-        }
+        }*/
       }
+
 
       //std::cerr << "order = " << idx << " vector: ";
       //cs[idx].printVector(prefix);
@@ -230,88 +170,3 @@ int main()
 
   return 0;
 }
-
-      /*
-      //Step 1) check to see if the context exists and add the context if it
-      //does not.  
-      if (!cs[idx].find(begin))
-      {
-        tuple t = std::make_pair(end, 1);
-        cs[idx].emplace(begin, t);
-      }
-      else 
-      {
-        //Step 2) if the context exists, check to see if the string exists
-        bool context_exists = false;
-        Context c = cs[idx];
-        std::vector<tuple> t = c.map[begin];
-        for (std::vector<tuple>::iterator it = t.begin();
-            it != t.end(); ++it)
-        {
-          tuple tup = *it;
-          if (std::get<0>(tup) == end) 
-          {
-            //the string exists so we need to increment the count
-            context_exists = true;
-            std::get<1>(tup) += 1;
-          }
-        }
-
-        //if the context does not exist then we:
-        //    (a) check the exceptions
-        //    (b) optionally print out the probability
-        //    (c) create list of new exceptions
-        //    (d) output the probability
-        if (!context_exists)
-        {
-
-          unsigned int escape = 0;
-          unsigned int total_count = 0;
-
-          for (std::vector<tuple>::iterator it = t.begin(); it != t.end(); ++it)
-          {
-
-            //check to see if the string is in the exception list
-            std::string curr_str = std::get<0>(*it);
-            unsigned int curr_count = std::get<1>(*it);
-
-            if (std::find(exceptions.begin(), exceptions.end(), curr_str) 
-                != exceptions.end())
-            {
-              //we found an exception, which means we need to remove it from
-              //consideration
-              //we can do this by ignoring it
-            }
-            else
-            {
-              //tally up the escapes and the counts
-              escape++;
-              total_count += curr_count;
-            }
-          }
-
-          //need to reset the exceptions here
-          exceptions.clear();
-          for (std::vector<tuple>::iterator it = t.begin(); it != t.end(); ++it)
-          {
-            exceptions.push_back(std::get<0>(*it));
-          }
-
-          //now we've checked all of the strings in the exception list
-          if (escape != 0)
-          {
-            //we have to output an escape
-            std::cout << "<$>, " << (escape*1.)/(escape+total_count) << std::endl;
-          }
-        }
-      }
-
-      //create substring
-      curr_string.push_back(file_contents[i]);
-      if (i > k-1)
-      {
-        curr_string = curr_string.substr(1,k);
-      }
-      std::cerr << curr_string << std::endl;
-    }
-    */
