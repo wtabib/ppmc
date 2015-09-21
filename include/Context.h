@@ -29,6 +29,7 @@ class Context {
     double getEscapeProbability( const std::string& prefix, 
                                 const std::string& suffix);
 
+    void printVector(std::string prefix);
 
   private:
     std::unordered_map<std::string, std::vector<tuple> > map;

@@ -10,9 +10,17 @@ bool Context::addPrefixAndSuffix(const std::string& prefix, const std::string& s
 
 bool Context::addSuffix(const std::string& prefix, const std::string& suffix)
 {
+  //std::cerr << "size of map before add suffix" << map.size() << std::endl;
   std::vector<tuple> t = map[prefix];
   t.push_back(std::make_pair(suffix, 1));
+  std::unordered_map<std::string, std::vector<tuple> >::const_iterator it = map.find(prefix);
+  map.erase(it);
   map.emplace(prefix, t);
+  //std::cerr << "size of map after add suffix" << map.size() << std::endl;
+  //std::cerr << "suffix = " << suffix << std::endl;
+  //std::cerr << std::endl;
+  //printVector(prefix);
+  //std::cerr << std::endl;
   return true;
 }
 
@@ -24,6 +32,11 @@ bool Context::findSuffix(const std::string& prefix, const std::string& suffix)
     for(std::vector<tuple>::iterator it = t.begin();
         it != t.end(); ++it)
     {
+      if (suffix == "i") {
+        std::cerr << "size of map = " << map.size() << std::endl;
+        std::cerr << "in findSuffix: " << std::get<0>(*it) << std::endl;
+        std::cerr << "suffix = " << suffix << std::endl;
+      }
       if (std::get<0>(*it) == suffix)
         return true;
     }
@@ -104,7 +117,11 @@ bool Context::incrementSuffixCount(const std::string& prefix, const std::string&
   {
     if (std::get<0>(t[i]) == suffix) {
       std::get<1>(t[i])++;
+
+      std::unordered_map<std::string, std::vector<tuple> >::const_iterator it = map.find(prefix);
+      map.erase(it);
       map.emplace(prefix, t);
+
       return true;
     }
   }
@@ -134,4 +151,17 @@ bool Context::needToPrintEscape(const std::string& prefix, const std::string& su
     return true;
 
   return false;
+}
+
+void Context::printVector(std::string prefix)
+{
+
+  std::vector<tuple> t = map[prefix];
+
+  for (int i = 0; i < t.size(); i++)
+  {
+    std::cerr << "<" << std::get<0>(t[i]) << ", " << std::get<1>(t[i]) << ">" << "\t";
+  }
+  std::cerr << std::endl;
+
 }

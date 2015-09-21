@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <assert.h>
+#include <iomanip>
 
 typedef std::tuple<std::string, unsigned int> tuple;
 
@@ -84,6 +85,8 @@ void printCharacterProbability( Context& c,
 int main()
 {
 
+  std::cerr << std::setprecision(5) << std::fixed;
+
   unsigned int k = 3;
 
   //read file
@@ -101,8 +104,8 @@ int main()
   //copy buffer into string
   std::string file_contents = buffer.str();
 
-  //std::cerr << "contents of the file " << std::endl;
-  //std::cerr << file_contents << std::endl;
+  std::cerr << "contents of the file " << std::endl;
+  std::cerr << file_contents << std::endl;
 
   std::string curr_string = "";
 
@@ -119,7 +122,7 @@ int main()
     cs.push_back(c);
   }
   //go through the string character by character
-  for (unsigned int i = 0; i <= file_contents.length(); ++i)
+  for (unsigned int i = 0; i < file_contents.length(); ++i)
   {
 
     if (file_contents[i] == EOF)
@@ -136,6 +139,7 @@ int main()
     //iterate through each context
     for (unsigned int j = k; j > 0; --j)
     {
+      std::cerr << "CONTEXT = " << j-1 << ", prefix = " << prefix << std::endl;
 
       unsigned int idx = j-1;
 
@@ -159,8 +163,16 @@ int main()
       {
         //is the suffix there?
         bool suffix_found = cs[idx].findSuffix(prefix,suffix);
+        std::cerr << "suffix_found = " << suffix_found << " , for suffix " << suffix << std::endl;
         if (suffix_found)
         {
+          //////
+          std::cerr << "printing exceptions " << std::endl;
+          for (int i = 0; i < exceptions.size(); i++)
+          {
+            std::cerr << "exception: " << exceptions[i] << std::endl;
+          }
+          /////
           if (idx == 0) 
           {
             double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
@@ -191,15 +203,24 @@ int main()
         }
       }
 
-      if (idx > 0)
+      //std::cerr << "order = " << idx << " vector: ";
+      //cs[idx].printVector(prefix);
+
+      //std::cerr << "prefix = " << prefix << std::endl;
+
+      if (idx > 1)
         prefix = prefix.substr(1,prefix.size()-1);
+      else
+        prefix = "";
+
     }
     //create substring
     curr_string.push_back(file_contents[i]);
-    if (i > k-1)
+    if (i > k-2)
     {
       curr_string = curr_string.substr(1,k);
     }
+    //std::cerr << "curr_string = " << curr_string << std::endl;
   }
 
   for (int i = 0; i < k; i++)
