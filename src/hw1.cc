@@ -3,10 +3,11 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <assert.h>
 
 typedef std::tuple<std::string, unsigned int> tuple;
 
-
+/*
 void getEscapeCounts(unsigned int& escape, 
     unsigned int& total_count, 
     const std::vector<tuple>& t, 
@@ -77,7 +78,7 @@ void printCharacterProbability( Context& c,
     // Case 2) this is not the first time we've seen the character,
     //        but we still need to handle exceptions
   }
-}
+}*/
 
 
 int main()
@@ -100,8 +101,8 @@ int main()
   //copy buffer into string
   std::string file_contents = buffer.str();
 
-  std::cerr << "contents of the file " << std::endl;
-  std::cerr << file_contents << std::endl;
+  //std::cerr << "contents of the file " << std::endl;
+  //std::cerr << file_contents << std::endl;
 
   std::string curr_string = "";
 
@@ -112,12 +113,23 @@ int main()
   }
 
   std::vector<Context> cs;
+  for (int i = 0; i < k; ++i)
+  {
+    Context c;
+    cs.push_back(c);
+  }
   //go through the string character by character
   for (unsigned int i = 0; i <= file_contents.length(); ++i)
   {
 
-    std::string begin = curr_string;
-    std::string end = file_contents[i];
+    if (file_contents[i] == EOF)
+      break;
+
+    std::stringstream ss;
+    std::string prefix = curr_string;
+    std::string suffix;
+    ss << file_contents[i];
+    ss >> suffix;
 
     std::vector<std::string> exceptions;
 
@@ -128,9 +140,77 @@ int main()
       unsigned int idx = j-1;
 
       //begin string is too small for the order
-      if (begin.length() != idx)
+      if (prefix.length() != idx)
         continue;
 
+      //check if prefix string exists in the context
+      bool prefix_str_found = cs[idx].findPrefixString(prefix);
+
+      if (prefix_str_found == false)  
+      {
+        if (idx == 0) 
+        {
+          double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
+          std::cerr << suffix << ", " << suffix_probability << std::endl;
+        }
+        cs[idx].addPrefixAndSuffix(prefix,suffix);
+      }
+      else 
+      {
+        //is the suffix there?
+        bool suffix_found = cs[idx].findSuffix(prefix,suffix);
+        if (suffix_found)
+        {
+          if (idx == 0) 
+          {
+            double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
+            std::cerr << suffix << ", " << suffix_probability << std::endl;
+          }
+
+          bool increment_success = cs[idx].incrementSuffixCount(prefix, suffix);
+          assert(increment_success);
+        }
+        else 
+        {
+          //now we have to deal with escape bullshit
+          bool do_we_escape = cs[idx].needToPrintEscape(prefix, suffix, exceptions);
+          // if we need to escape, we print out the escape and then update the
+          // contents
+          if (do_we_escape) {
+            double probability = cs[idx].getEscapeProbability(prefix, suffix);
+            std::cerr << "<$>, " << probability << std::endl;
+          }
+
+          //if we're on the 0th context then we should emit a probability
+          if (idx == 0) 
+          {
+            double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
+            std::cerr << suffix << ", " << suffix_probability << std::endl;
+          }
+          cs[idx].addSuffix(prefix, suffix);
+        }
+      }
+
+      if (idx > 0)
+        prefix = prefix.substr(1,prefix.size()-1);
+    }
+    //create substring
+    curr_string.push_back(file_contents[i]);
+    if (i > k-1)
+    {
+      curr_string = curr_string.substr(1,k);
+    }
+  }
+
+  for (int i = 0; i < k; i++)
+  {
+    std::cerr << "context = " << i << ", size = " << cs[i].size() << std::endl;
+  }
+
+  return 0;
+}
+
+      /*
       //Step 1) check to see if the context exists and add the context if it
       //does not.  
       if (!cs[idx].find(begin))
@@ -213,6 +293,4 @@ int main()
       }
       std::cerr << curr_string << std::endl;
     }
-
-    return 0;
-  }
+    */

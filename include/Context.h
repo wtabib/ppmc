@@ -1,4 +1,6 @@
-#include <boost/shared_ptr.hpp>
+#ifndef CONTEXT_H
+#define CONTEXT_H
+
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -12,10 +14,25 @@ typedef std::tuple<std::string, unsigned int> tuple;
 class Context {
 
   public:
-    bool insert(const std::string& key, const std::vector<tuple> &t);
-    bool find(const std::string& key, const std::string& count);
+    bool addPrefixAndSuffix(const std::string& prefix, const std::string& suffix);
+    bool addSuffix(const std::string& prefix, const std::string& suffix);
+    bool findSuffix(const std::string& prefix, const std::string& suffix);
+    bool findPrefixString(const std::string& prefix);
+    unsigned int size();
+    double getSuffixProbability( const std::string& prefix, 
+                                 const std::string& suffix, 
+                                 std::vector<std::string>& exceptions, 
+                                 std::vector<int>& char_list);
 
-    std::unordered_map<std::string, std::vector<tuple> > map;
+    bool incrementSuffixCount(const std::string& prefix, const std::string& suffix);
+    bool needToPrintEscape(const std::string& prefix, const std::string& suffix, std::vector<std::string>& exceptions);
+    double getEscapeProbability( const std::string& prefix, 
+                                const std::string& suffix);
+
+
   private:
+    std::unordered_map<std::string, std::vector<tuple> > map;
 
 };
+
+#endif
