@@ -3,18 +3,14 @@
 bool Context::addPrefixAndSuffix(const std::string& prefix, const std::string& suffix)
 {
   std::vector<tuple> t;
-  t.push_back(std::make_pair(suffix, 1));
   map.emplace(prefix, t);
+  map[prefix].push_back(std::make_pair(suffix,1));
   return true;
 }
 
 bool Context::addSuffix(const std::string& prefix, const std::string& suffix)
 {
-  std::vector<tuple> t = map[prefix];
-  t.push_back(std::make_pair(suffix, 1));
-  std::unordered_map<std::string, std::vector<tuple> >::const_iterator it = map.find(prefix);
-  map.erase(it);
-  map.emplace(prefix, t);
+  map[prefix].push_back(std::make_pair(suffix,1));
   return true;
 }
 
@@ -79,7 +75,7 @@ double Context::getSuffixProbability( const std::string& prefix,
     if (std::get<0>(*it) == suffix)
       char_count += std::get<1>(*it);
   }
-  
+ 
   double probability = char_count/(num_chars+num_escapes);
   return probability;
 }
@@ -100,8 +96,7 @@ double Context::getEscapeProbability( const std::string& prefix,
       num_chars += std::get<1>(*it);
     }
   }
-  //std::cerr << "number of exceptions" << exceptions.size() << std::endl;
-  //std::cerr << "num_escapes = " << num_escapes << ", num_chars = " << num_chars << std::endl;
+
   double probability = num_escapes/(num_chars+num_escapes);
   return probability;
 }
@@ -117,12 +112,7 @@ bool Context::incrementSuffixCount(const std::string& prefix, const std::string&
   for (int i = 0; i < t.size(); ++i)
   {
     if (std::get<0>(t[i]) == suffix) {
-      std::get<1>(t[i])++;
-
-      std::unordered_map<std::string, std::vector<tuple> >::const_iterator it = map.find(prefix);
-      map.erase(it);
-      map.emplace(prefix, t);
-
+      std::get<1>(map[prefix][i])++;
       return true;
     }
   }
@@ -174,7 +164,7 @@ void Context::printOrder()
       it != map.end(); ++it)
   {
     std::vector<tuple> t = std::get<1>(*it);
-    std::cerr << "prefix = " << std::get<0>(*it);
+    std::cerr << "prefix = " << std::get<0>(*it) << "\n";
     for (int j = 0; j < t.size(); ++j)
     {
       std::cerr << "\t\t" << std::get<0>(t[j]) << "\t\t" << std::get<1>(t[j]) << std::endl;
@@ -182,27 +172,16 @@ void Context::printOrder()
   }
 }
 
-void Context::checkExceptions(std::string& prefix, std::string& suffix, std::vector<std::string> exceptions)
+void Context::checkExceptions(std::string& prefix, std::string& suffix, std::vector<std::string>& exceptions)
 {
   exceptions.clear();
 
-  if (map.find(suffix) != map.end())
-  {
-    std::vector<tuple> t = map[suffix];
-    for (int i = 0; i < t.size(); i++)
-    {
-      if (std::get<0>(t[i]) != suffix)
-        exceptions.push_back(std::get<0>(t[i]));
-    }
-    return;
-  }
-
   //add all of the characters in the order you're about to be put into
-  /*std::vector<tuple> t = map[prefix];
+  std::vector<tuple> t = map[prefix];
   for (int i = 0; i < t.size(); i++)
   {
     if (std::get<0>(t[i]) != suffix)
       exceptions.push_back(std::get<0>(t[i]));
-  }*/
+  }
 }
 

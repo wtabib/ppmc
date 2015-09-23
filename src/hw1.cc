@@ -20,19 +20,20 @@ void printTable(std::vector<Context> cs)
 int main(int argc, char* argv[])
 {
 
-  if (argc != 2)
+  /*if (argc != 2)
     std::cerr << "Input: <k>" << std::endl;
 
-  float arg_k = atof(argv[1]);
+  float arg_k = atof(argv[1]);*/
 
   double total_probability = 0;
   std::cout << std::setprecision(5) << std::fixed;
 
-  unsigned int k = arg_k;
+  //unsigned int k = arg_k;
+  unsigned int k = 3;
 
   //read file
   std::ifstream file;
-  file.open("/Users/wtabib/Documents/classes/15-853/hw1/data/input-wtabib.txt");
+  file.open("/Users/wtabib/Documents/classes/15-853/hw1/data/test-input.txt");
   if (file.is_open()) {
     std::cout << "file is open" << std::endl;
   }
@@ -134,22 +135,9 @@ int main(int argc, char* argv[])
           }
 
           cs[idx].checkExceptions(prefix, suffix, exceptions);
-          /*std::cout << ", exceptions = ";
-          for (int i = 0; i < exceptions.size(); i++)
-          {
-            std::cout << ", " << exceptions[i];
-          }
-          std::cout << std::endl;*/
-
           cs[idx].addSuffix(prefix, suffix);
         }
       }
-
-
-      //std::cout << "order = " << idx << " vector: ";
-      //cs[idx].printVector(prefix);
-
-      //std::cout << "prefix = " << prefix << std::endl;
 
       if (idx > 1)
         prefix = prefix.substr(1,prefix.size()-1);
@@ -166,7 +154,6 @@ int main(int argc, char* argv[])
     //std::cout << "curr_string = " << curr_string << std::endl;
     exceptions.clear();
 
-    //printTable(cs);
   }
 
   std::cout << "total probability = " << total_probability << std::endl;

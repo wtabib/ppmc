@@ -20,7 +20,7 @@ class Context {
     bool findPrefixString(const std::string& prefix);
     unsigned int size();
     void checkExceptions(std::string& prefix, std::string& suffix, 
-        std::vector<std::string> exceptions);
+        std::vector<std::string>& exceptions);
     void checkExceptions2(std::string& prefix, std::string& suffix, 
         std::vector<std::string> exceptions);
     double getSuffixProbability( const std::string& prefix, 
