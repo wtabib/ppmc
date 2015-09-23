@@ -124,8 +124,10 @@ int main(int argc, char* argv[])
           double probability = cs[idx].getEscapeProbability(prefix, suffix, 
               exceptions);
           if (probability == probability)
-          std::cout << "<$>, " << probability << std::endl;
-          total_probability += log2(1/probability);
+          {
+            std::cout << "<$>, " << probability << std::endl;
+            total_probability += log2(1/probability);
+          }
 
           if (idx == 0) {
             double suffix_probability = cs[idx].getSuffixProbability(prefix, 
