@@ -75,7 +75,11 @@ double Context::getSuffixProbability( const std::string& prefix,
     if (std::get<0>(*it) == suffix)
       char_count += std::get<1>(*it);
   }
- 
+
+  /*if (suffix == "i")
+    printOrder();
+    */
+
   double probability = char_count/(num_chars+num_escapes);
   return probability;
 }

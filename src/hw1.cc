@@ -17,6 +17,14 @@ void printTable(std::vector<Context> cs)
   }
 }
 
+void print(std::string& s, double p)
+{
+  if (s == "")
+    std::cout << "' ', " << p << std::endl;
+  else 
+    std::cout << s << ", " << p << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
 
@@ -89,13 +97,16 @@ int main(int argc, char* argv[])
 
       //check if prefix string exists in the context
       bool prefix_str_found = cs[idx].findPrefixString(prefix);
+      if ( suffix == "t" && prefix == "n ")
+        std::cerr << "PREFIX_STR_FOUND = " << prefix_str_found << std::endl;
+
 
       if (prefix_str_found == false)  {
         //std::cout << "here" << std::endl;
         if (idx == 0) {
           double suffix_probability = cs[idx].getSuffixProbability(prefix, 
               suffix, exceptions, char_vec);
-          std::cout << suffix << ", " << suffix_probability << std::endl;
+          print(suffix, suffix_probability);
           total_probability += log2(1/suffix_probability);
         }
         cs[idx].checkExceptions(prefix, suffix, exceptions);
@@ -108,16 +119,25 @@ int main(int argc, char* argv[])
         if (suffix_found)
         {
           //std::cout << "here3" << std::endl;
-          if (idx == 0) {
-            double suffix_probability = cs[idx].getSuffixProbability(prefix, 
+          double suffix_probability = cs[idx].getSuffixProbability(prefix, 
                 suffix, exceptions, char_vec);
-            std::cout << suffix << ", " << suffix_probability << std::endl;
-            total_probability += log2(1/suffix_probability);
-          }
+          print(suffix, suffix_probability);
+          total_probability += log2(1/suffix_probability);
 
           cs[idx].checkExceptions(prefix, suffix, exceptions);
           bool increment_success = cs[idx].incrementSuffixCount(prefix, suffix);
+          for (int j = idx-1; j >= 0; j--) {
+            if (j > 1)
+              prefix = prefix.substr(1,prefix.size()-1);
+            else
+              prefix = "";
+            cs[j].incrementSuffixCount(prefix, suffix);
+          }
           assert(increment_success);
+          if ( suffix == "t" && prefix == "")
+            cs[2].printOrder();
+          //std::cout << "got here, order = " << idx << ", suffix = " << suffix << std::endl;
+          break;
         }
         else {
           //std::cout << "here4" << std::endl;
@@ -125,19 +145,27 @@ int main(int argc, char* argv[])
               exceptions);
           if (probability == probability)
           {
-            std::cout << "<$>, " << probability << std::endl;
+            std::string escape_str = "<$>";
+            print(escape_str, probability);
             total_probability += log2(1/probability);
           }
 
           if (idx == 0) {
             double suffix_probability = cs[idx].getSuffixProbability(prefix, 
                 suffix, exceptions, char_vec);
-            std::cout << suffix << ", " << suffix_probability << std::endl;
+            print(suffix, suffix_probability);
             total_probability += log2(1/suffix_probability);
           }
 
           cs[idx].checkExceptions(prefix, suffix, exceptions);
           cs[idx].addSuffix(prefix, suffix);
+
+          if (suffix == "t" && prefix == "n ") {
+            std::cerr << "Order " << idx << std::endl;
+            std::cerr << "--------" << std::endl;
+            cs[idx].printOrder();
+            std::cerr << "--------" << std::endl;
+          }
         }
       }
 
