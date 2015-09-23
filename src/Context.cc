@@ -100,7 +100,8 @@ double Context::getEscapeProbability( const std::string& prefix,
       num_chars += std::get<1>(*it);
     }
   }
-  std::cerr << "num_escapes = " << num_escapes << ", num_chars = " << num_chars << std::endl;
+  //std::cerr << "number of exceptions" << exceptions.size() << std::endl;
+  //std::cerr << "num_escapes = " << num_escapes << ", num_chars = " << num_chars << std::endl;
   double probability = num_escapes/(num_chars+num_escapes);
   return probability;
 }
@@ -166,6 +167,21 @@ void Context::printVector(std::string prefix)
 
 }
 
+void Context::printOrder()
+{
+
+  for (std::unordered_map<std::string, std::vector<tuple> >::iterator it = map.begin();
+      it != map.end(); ++it)
+  {
+    std::vector<tuple> t = std::get<1>(*it);
+    std::cerr << "prefix = " << std::get<0>(*it);
+    for (int j = 0; j < t.size(); ++j)
+    {
+      std::cerr << "\t\t" << std::get<0>(t[j]) << "\t\t" << std::get<1>(t[j]) << std::endl;
+    }
+  }
+}
+
 void Context::checkExceptions(std::string& prefix, std::string& suffix, std::vector<std::string> exceptions)
 {
   exceptions.clear();
@@ -178,5 +194,15 @@ void Context::checkExceptions(std::string& prefix, std::string& suffix, std::vec
       if (std::get<0>(t[i]) != suffix)
         exceptions.push_back(std::get<0>(t[i]));
     }
+    return;
   }
+
+  //add all of the characters in the order you're about to be put into
+  /*std::vector<tuple> t = map[prefix];
+  for (int i = 0; i < t.size(); i++)
+  {
+    if (std::get<0>(t[i]) != suffix)
+      exceptions.push_back(std::get<0>(t[i]));
+  }*/
 }
+

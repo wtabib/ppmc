@@ -8,18 +8,32 @@
 
 typedef std::tuple<std::string, unsigned int> tuple;
 
-int main()
+void printTable(std::vector<Context> cs)
+{
+  for (int i = 0; i < cs.size(); i++)
+  {
+    std::cout << "ORDER " << i << std::endl;
+    cs[i].printOrder();
+  }
+}
+
+int main(int argc, char* argv[])
 {
 
-  std::cerr << std::setprecision(5) << std::fixed;
+  if (argc != 2)
+    std::cerr << "Input: <k>" << std::endl;
 
-  unsigned int k = 3;
+  float arg_k = atof(argv[1]);
+
+  double total_probability = 0;
+  std::cout << std::setprecision(5) << std::fixed;
+
+  unsigned int k = arg_k;
 
   //read file
   std::ifstream file;
-  file.open("/Users/wtabib/Documents/classes/15-853/hw1/data/test-input.txt");
-  if (file.is_open()) 
-  {
+  file.open("/Users/wtabib/Documents/classes/15-853/hw1/data/input-wtabib.txt");
+  if (file.is_open()) {
     std::cout << "file is open" << std::endl;
   }
 
@@ -30,8 +44,8 @@ int main()
   //copy buffer into string
   std::string file_contents = buffer.str();
 
-  std::cerr << "contents of the file " << std::endl;
-  std::cerr << file_contents << std::endl;
+  std::cout << "contents of the file " << std::endl;
+  std::cout << file_contents << std::endl;
 
   std::string curr_string = "";
 
@@ -75,72 +89,67 @@ int main()
       //check if prefix string exists in the context
       bool prefix_str_found = cs[idx].findPrefixString(prefix);
 
-      if (prefix_str_found == false)  
-      {
-        if (idx == 0) 
-        {
-          double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
-          std::cerr << suffix << ", " << suffix_probability << std::endl;
+      if (prefix_str_found == false)  {
+        //std::cout << "here" << std::endl;
+        if (idx == 0) {
+          double suffix_probability = cs[idx].getSuffixProbability(prefix, 
+              suffix, exceptions, char_vec);
+          std::cout << suffix << ", " << suffix_probability << std::endl;
+          total_probability += log2(1/suffix_probability);
         }
         cs[idx].checkExceptions(prefix, suffix, exceptions);
         cs[idx].addPrefixAndSuffix(prefix,suffix);
       }
-      else 
-      {
+      else {
+        //std::cout << "here2" << std::endl;
         //is the suffix there?
         bool suffix_found = cs[idx].findSuffix(prefix,suffix);
         if (suffix_found)
         {
-          if (idx == 0) 
-          {
-            double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
-            std::cerr << suffix << ", " << suffix_probability << std::endl;
+          //std::cout << "here3" << std::endl;
+          if (idx == 0) {
+            double suffix_probability = cs[idx].getSuffixProbability(prefix, 
+                suffix, exceptions, char_vec);
+            std::cout << suffix << ", " << suffix_probability << std::endl;
+            total_probability += log2(1/suffix_probability);
           }
 
           cs[idx].checkExceptions(prefix, suffix, exceptions);
           bool increment_success = cs[idx].incrementSuffixCount(prefix, suffix);
           assert(increment_success);
         }
-        else 
-        {
-          double probability = cs[idx].getEscapeProbability(prefix, suffix, exceptions);
-          std::cerr << "<$>, " << probability << std::endl;
+        else {
+          //std::cout << "here4" << std::endl;
+          double probability = cs[idx].getEscapeProbability(prefix, suffix, 
+              exceptions);
+          if (probability == probability)
+          std::cout << "<$>, " << probability << std::endl;
+          total_probability += log2(1/probability);
 
-          if (idx == 0) 
-          {
-            double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
-            std::cerr << suffix << ", " << suffix_probability << std::endl;
+          if (idx == 0) {
+            double suffix_probability = cs[idx].getSuffixProbability(prefix, 
+                suffix, exceptions, char_vec);
+            std::cout << suffix << ", " << suffix_probability << std::endl;
+            total_probability += log2(1/suffix_probability);
           }
 
           cs[idx].checkExceptions(prefix, suffix, exceptions);
+          /*std::cout << ", exceptions = ";
+          for (int i = 0; i < exceptions.size(); i++)
+          {
+            std::cout << ", " << exceptions[i];
+          }
+          std::cout << std::endl;*/
+
           cs[idx].addSuffix(prefix, suffix);
         }
-        /*else 
-        {
-          //now we have to deal with escape bullshit
-          bool do_we_escape = cs[idx].needToPrintEscape(prefix, suffix, exceptions);
-          // if we need to escape, we print out the escape and then update the
-          // contents
-          if (do_we_escape) {
-            double probability = cs[idx].getEscapeProbability(prefix, suffix);
-            std::cerr << "<$>, " << probability << std::endl;
-          }
-
-          //if we're on the 0th context then we should emit a probability
-          if (idx == 0) 
-          {
-            double suffix_probability = cs[idx].getSuffixProbability(prefix, suffix, exceptions, char_vec);
-            std::cerr << suffix << ", " << suffix_probability << std::endl;
-          }
-          cs[idx].addSuffix(prefix, suffix);
-        }*/
       }
 
 
-      //std::cerr << "order = " << idx << " vector: ";
+      //std::cout << "order = " << idx << " vector: ";
       //cs[idx].printVector(prefix);
 
-      //std::cerr << "prefix = " << prefix << std::endl;
+      //std::cout << "prefix = " << prefix << std::endl;
 
       if (idx > 1)
         prefix = prefix.substr(1,prefix.size()-1);
@@ -154,13 +163,13 @@ int main()
     {
       curr_string = curr_string.substr(1,k);
     }
-    //std::cerr << "curr_string = " << curr_string << std::endl;
+    //std::cout << "curr_string = " << curr_string << std::endl;
+    exceptions.clear();
+
+    //printTable(cs);
   }
 
-  for (int i = 0; i < k; i++)
-  {
-    std::cerr << "context = " << i << ", size = " << cs[i].size() << std::endl;
-  }
+  std::cout << "total probability = " << total_probability << std::endl;
 
   return 0;
 }

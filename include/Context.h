@@ -19,19 +19,24 @@ class Context {
     bool findSuffix(const std::string& prefix, const std::string& suffix);
     bool findPrefixString(const std::string& prefix);
     unsigned int size();
-    void checkExceptions(std::string& prefix, std::string& suffix, std::vector<std::string> exceptions);
+    void checkExceptions(std::string& prefix, std::string& suffix, 
+        std::vector<std::string> exceptions);
+    void checkExceptions2(std::string& prefix, std::string& suffix, 
+        std::vector<std::string> exceptions);
     double getSuffixProbability( const std::string& prefix, 
                                  const std::string& suffix, 
                                  std::vector<std::string>& exceptions, 
                                  std::vector<int>& char_list);
 
     bool incrementSuffixCount(const std::string& prefix, const std::string& suffix);
-    bool needToPrintEscape(const std::string& prefix, const std::string& suffix, std::vector<std::string>& exceptions);
+    bool needToPrintEscape(const std::string& prefix, const std::string& suffix, 
+        std::vector<std::string>& exceptions);
     double getEscapeProbability( const std::string& prefix, 
                                 const std::string& suffix,
                                 std::vector<std::string>& exceptions);
 
     void printVector(std::string prefix);
+    void printOrder();
 
   private:
     std::unordered_map<std::string, std::vector<tuple> > map;
